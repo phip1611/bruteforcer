@@ -1,59 +1,42 @@
 use std::env;
 use std::process::exit;
 
+mod strings;
+mod args;
+mod options;
+
 use libbruteforce::crack;
-use libbruteforce::symbols::{build_alphabet, combinations_count, full_alphabet};
+use libbruteforce::symbols::{build_alphabet, combinations_count, full_alphabet, UC_UMLAUTS, LC_UMLAUTS, COMMON_SPECIAL_CHARS, ALL_OTHER_SPECIAL_CHARS};
 use libbruteforce::transformation_fns::identity::NO_HASHING;
 use libbruteforce::transformation_fns::md5::MD5_HASHING;
 use libbruteforce::transformation_fns::sha1::SHA1_HASHING;
 use libbruteforce::transformation_fns::sha256::SHA256_HASHING;
+use crate::args::analyze_args;
+use crate::strings::{HELP_TEXT, HELP_TEXT_SHORT};
 
 fn main() {
-    let alphabet = full_alphabet();
-
-    // Typ definition necessary!
-    let mut algo = NO_HASHING;
-    let mut input;
-    let mut max_len;
-
     let mut args = vec![];
     env::args().for_each(|s| args.push(s));
+    args.remove(0); // remove the program name
+    let args = analyze_args(args);
 
-    if args.len() == 3 {
-        println!("Using identity algorithm to crack value");
-        max_len = args[1].parse::<usize>().unwrap();
-        input = String::from(&args[2]);
-    } else if args.len() == 4 {
-        max_len = args[1].parse::<usize>().unwrap();
-        input = String::from(&args[3]);
-        if args[2].eq("md5") {
-            algo = MD5_HASHING;
-            // string representation from hashes are lowercase
-            input = input.to_ascii_lowercase();
-        } else if args[2].eq("sha1") {
-            algo = SHA1_HASHING;
-            // string representation from hashes are lowercase
-            input = input.to_ascii_lowercase();
-        } else if args[2].eq("sha256") {
-            algo = SHA256_HASHING;
-            // string representation from hashes are lowercase
-            input = input.to_ascii_lowercase();
-        } else {
-            println!("Using identity algorithm to crack value");
-        }
-    } else {
-        eprintln!("Usage: $ bruteforcer %length% ['md5'|'sha1'|'sha256'] %value_to_crack%");
-        exit(0);
+    if args.is_none() {
+        show_help(true);
+        return;
+    }
+    let args = args.unwrap();
+    if args.flag_show_help {
+        show_help(false);
+        return;
     }
 
-    println!("Trying all {} possible combinations.", format_combinations_string(combinations_count(&alphabet, max_len as u32)));
-
+/*
     let _result = crack(
         input,
         alphabet,
         max_len,
         algo
-    );
+    );*/
 
 }
 
@@ -73,4 +56,16 @@ fn format_combinations_string(count: usize) -> String {
         }
     }
     formatted.chars().rev().collect::<String>()
+}
+
+pub fn show_help(short: bool) {
+    if short {
+        println!("{}", HELP_TEXT_SHORT);
+    } else {
+        println!("{}", HELP_TEXT);
+        println!("Umlauts lower case:\n{:?}", LC_UMLAUTS);
+        println!("Umlauts upper case:\n{:?}", UC_UMLAUTS);
+        println!("Common special chars:\n{:?}", COMMON_SPECIAL_CHARS);
+        println!("All other special chars:\n{:?}", ALL_OTHER_SPECIAL_CHARS);
+    }
 }
