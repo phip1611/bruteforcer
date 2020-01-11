@@ -1,10 +1,10 @@
 use libbruteforce::symbols;
 use libbruteforce::symbols::full_alphabet;
-use libbruteforce::transformation_fns::identity::NO_HASHING;
-use libbruteforce::transformation_fns::md5::MD5_HASHING;
-use libbruteforce::transformation_fns::sha1::SHA1_HASHING;
-use libbruteforce::transformation_fns::sha256::SHA256_HASHING;
 use libbruteforce::transformation_fns::TransformationFn;
+use libbruteforce::transformation_fns::MD5_HASHING;
+use libbruteforce::transformation_fns::NO_HASHING;
+use libbruteforce::transformation_fns::SHA1_HASHING;
+use libbruteforce::transformation_fns::SHA256_HASHING;
 
 use crate::args::CliArgs;
 use core::fmt;
@@ -61,27 +61,16 @@ impl ProgramOptions {
             let ca = ca.unwrap();
             ca.chars().for_each(|c| chars.push(c));
         } else {
-            if args.flag_lowercase_umlauts {
-                chars.extend_from_slice(&symbols::LC_UMLAUTS)
-            }
-            if args.flag_uppercase_umlauts {
-                chars.extend_from_slice(&symbols::UC_UMLAUTS)
-            }
-            if args.flag_lowercase_letters {
-                chars.extend_from_slice(&symbols::LC_LETTERS)
-            }
-            if args.flag_uppercase_letters {
-                chars.extend_from_slice(&symbols::UC_LETTERS)
-            }
-            if args.flag_digits {
-                chars.extend_from_slice(&symbols::DIGITS)
-            }
-            if args.flag_common_special_chars {
-                chars.extend_from_slice(&symbols::COMMON_SPECIAL_CHARS)
-            }
-            if args.flag_all_special_chars {
-                chars.extend_from_slice(&symbols::ALL_OTHER_SPECIAL_CHARS)
-            }
+            // map flags on build_alphabet from the library
+            chars.extend_from_slice(&symbols::build_alphabet(
+                args.flag_lowercase_letters,
+                args.flag_uppercase_letters,
+                args.flag_digits,
+                args.flag_lowercase_umlauts,
+                args.flag_uppercase_umlauts,
+                args.flag_common_special_chars,
+                args.flag_all_special_chars,
+            ));
 
             // No options are set is equal to all are set
             if chars.len() == 0 {
