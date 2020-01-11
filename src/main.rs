@@ -1,18 +1,19 @@
 use std::env;
-use std::process::exit;
-
-mod strings;
-mod args;
-mod options;
+use std::time::Instant;
 
 use libbruteforce::crack;
-use libbruteforce::symbols::{build_alphabet, combinations_count, full_alphabet, UC_UMLAUTS, LC_UMLAUTS, COMMON_SPECIAL_CHARS, ALL_OTHER_SPECIAL_CHARS};
-use libbruteforce::transformation_fns::identity::NO_HASHING;
-use libbruteforce::transformation_fns::md5::MD5_HASHING;
-use libbruteforce::transformation_fns::sha1::SHA1_HASHING;
-use libbruteforce::transformation_fns::sha256::SHA256_HASHING;
+use libbruteforce::symbols::{
+    combinations_count, ALL_OTHER_SPECIAL_CHARS, COMMON_SPECIAL_CHARS, LC_UMLAUTS, UC_UMLAUTS,
+};
+
 use crate::args::analyze_args;
+use crate::options::ProgramOptions;
 use crate::strings::{HELP_TEXT, HELP_TEXT_SHORT};
+
+mod args;
+mod options;
+mod strings;
+mod util;
 
 fn main() {
     let mut args = vec![];
@@ -29,15 +30,34 @@ fn main() {
         show_help(false);
         return;
     }
+    let ops = ProgramOptions::from(&args);
 
-/*
-    let _result = crack(
-        input,
-        alphabet,
-        max_len,
-        algo
-    );*/
+    // println!("CliArgs:\n{:#?}", &args);
+    // println!("ProgramOptions:\n{}", &ops);
 
+    let count = combinations_count(&ops.alphabet, ops.max_len as u32);
+    println!(
+        "Starting to crack. There are {} possible solutions",
+        format_combinations_string(count)
+    );
+
+    let begin_time = Instant::now();
+    let result = crack(
+        ops.value_to_crack.to_string(),
+        ops.alphabet.clone(),
+        ops.max_len,
+        // todo implement min length support in lib
+        ops.algo,
+    );
+
+    let duration = util::seconds_elapsed_as_fraction(&begin_time);
+    println!("done after {}s", duration);
+
+    if result.is_some() {
+        println!("The password is: {}", result.unwrap());
+    } else {
+        println!("No solution found");
+    }
 }
 
 /// Makes "15252626" to "15.252.626"
@@ -63,6 +83,7 @@ pub fn show_help(short: bool) {
         println!("{}", HELP_TEXT_SHORT);
     } else {
         println!("{}", HELP_TEXT);
+        println!();
         println!("Umlauts lower case:\n{:?}", LC_UMLAUTS);
         println!("Umlauts upper case:\n{:?}", UC_UMLAUTS);
         println!("Common special chars:\n{:?}", COMMON_SPECIAL_CHARS);

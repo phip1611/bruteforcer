@@ -1,5 +1,3 @@
-use libbruteforce::transformation_fns::identity::NO_HASHING;
-
 pub fn analyze_args(args: Vec<String>) -> Option<CliArgs> {
     if args.is_empty() {
         return None;
@@ -25,12 +23,15 @@ pub fn analyze_args(args: Vec<String>) -> Option<CliArgs> {
             cli_args.flag_common_special_chars = true;
         } else if "-h".eq(&arg) {
             cli_args.flag_show_help = true;
+        } else if arg.starts_with("-A=") {
+            let chars = &arg["-A=".len()..];
+            cli_args.custom_alphabet = Some(String::from(chars));
         } else if i == 0 {
             i += 1;
             cli_args.input_to_crack = Some(arg);
         } else if i == 1 {
             i += 1;
-            cli_args.input_to_crack = Some(arg);
+            cli_args.hashing_algo = Some(arg);
         } else if i == 2 {
             i += 1;
             cli_args.max_len = Some(arg.parse::<usize>().expect("Must be a number!"));
@@ -45,11 +46,14 @@ pub fn analyze_args(args: Vec<String>) -> Option<CliArgs> {
 
 /// Struct that represents every possible value/flag you can pass to the program to
 /// further analyze what's to do in a next step.
+#[derive(Debug)]
 pub struct CliArgs {
     pub input_to_crack: Option<String>,
     pub hashing_algo: Option<String>,
     pub max_len: Option<usize>,
     pub min_len: Option<usize>,
+    /// String with all the chars that should be used
+    pub custom_alphabet: Option<String>,
     pub flag_show_help: bool,
     pub flag_lowercase_letters: bool,
     pub flag_uppercase_letters: bool,
@@ -67,6 +71,7 @@ impl CliArgs {
             hashing_algo: None,
             max_len: None,
             min_len: None,
+            custom_alphabet: None,
             flag_show_help: false,
             flag_lowercase_letters: false,
             flag_uppercase_letters: false,
@@ -74,7 +79,7 @@ impl CliArgs {
             flag_uppercase_umlauts: false,
             flag_digits: false,
             flag_common_special_chars: false,
-            flag_all_special_chars: false
+            flag_all_special_chars: false,
         }
     }
 }

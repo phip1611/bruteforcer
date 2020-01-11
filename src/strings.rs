@@ -1,9 +1,10 @@
-pub static HELP_TEXT_SHORT: &'static str =
-"$ bruteforcer <input_to_crack> <hashing_algo> <max_len> <min_len>
-$ bruteforcer -h (for help)";
+pub static HELP_TEXT_SHORT: &'static str = "\
+$ bruteforcer <input_to_crack> <hashing_algo> <max_len> <min_len>
+$ bruteforcer -h (for help)\
+";
 
-pub static HELP_TEXT: &'static str =
-"Synopsis:
+pub static HELP_TEXT: &'static str = "\
+Synopsis:
     $ bruteforcer <input_to_crack:string> <hashing_algo:string> <max_len:num> <min_len:num> [... flags]
 
 hashing algorithm:
@@ -24,5 +25,5 @@ flags:
         - if this is set the above flags will be ignored
         - there is no check if each character is only once in the string
 
-    hint: flags can stand anywhere in the command
+    hint: flags can stand anywhere in the command\
 ";
