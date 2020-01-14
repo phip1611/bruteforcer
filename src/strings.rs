@@ -20,7 +20,8 @@ flags:
     -u: use lower case umlauts (ä-ü)
     -S: use all special chars on QWERTZ keyboards
     -s: use common special chars on QWERTZ keyboards
-    -h: show help
+    -h: show help 
+    -f: fair mode (use n-1 threads)
     -A=<Characters>
         - if this is set the above flags will be ignored
         - there is no check if each character is only once in the string

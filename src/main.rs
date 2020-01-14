@@ -1,10 +1,10 @@
 use std::env;
 use std::time::Instant;
 
-use libbruteforce::crack;
 use libbruteforce::symbols::{
     combinations_count, ALL_OTHER_SPECIAL_CHARS, COMMON_SPECIAL_CHARS, LC_UMLAUTS, UC_UMLAUTS,
 };
+use libbruteforce::{crack, CrackParameter};
 
 use crate::args::analyze_args;
 use crate::options::ProgramOptions;
@@ -13,7 +13,6 @@ use crate::strings::{HELP_TEXT, HELP_TEXT_SHORT};
 mod args;
 mod options;
 mod strings;
-mod util;
 
 fn main() {
     let mut args = vec![];
@@ -32,36 +31,28 @@ fn main() {
     }
     let ops = ProgramOptions::from(&args);
 
-    // println!("CliArgs:\n{:#?}", &args);
-    // println!("ProgramOptions:\n{}", &ops);
-
-    let count = combinations_count(&ops.alphabet, ops.max_len as u32);
-    println!(
-        "Starting to crack. There are {} possible solutions",
-        format_combinations_string(count)
-    );
-
-    let begin_time = Instant::now();
-    let result = crack(
-        ops.value_to_crack.to_string(),
-        ops.alphabet.clone(),
+    let cp = CrackParameter::new(
+        ops.value_to_crack,
+        ops.alphabet,
         ops.max_len,
-        // todo implement min length support in lib
+        ops.min_len,
         ops.algo,
+        ops.fair_mode,
     );
 
-    let duration = util::seconds_elapsed_as_fraction(&begin_time);
-    println!("done after {}s", duration);
+    let result = crack(cp);
 
-    if result.is_some() {
-        println!("The password is: {}", result.unwrap());
+    println!("done after {}s", result.seconds_as_fraction);
+
+    if result.is_success() {
+        println!("The password is: {}", result.solution.unwrap());
     } else {
         println!("No solution found");
     }
 }
 
 /// Makes "15252626" to "15.252.626"
-fn format_combinations_string(count: usize) -> String {
+/*fn format_combinations_string(count: usize) -> String {
     let mut formatted = String::new();
     let unformatted = format!("{}", count);
     let unformatted = unformatted.as_bytes();
@@ -76,7 +67,7 @@ fn format_combinations_string(count: usize) -> String {
         }
     }
     formatted.chars().rev().collect::<String>()
-}
+}*/
 
 pub fn show_help(short: bool) {
     if short {

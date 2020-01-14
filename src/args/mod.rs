@@ -23,6 +23,8 @@ pub fn analyze_args(args: Vec<String>) -> Option<CliArgs> {
             cli_args.flag_common_special_chars = true;
         } else if "-h".eq(&arg) {
             cli_args.flag_show_help = true;
+        } else if "-f".eq(&arg) {
+            cli_args.flag_fair_mode = true;
         } else if arg.starts_with("-A=") {
             let chars = &arg["-A=".len()..];
             cli_args.custom_alphabet = Some(String::from(chars));
@@ -34,10 +36,10 @@ pub fn analyze_args(args: Vec<String>) -> Option<CliArgs> {
             cli_args.hashing_algo = Some(arg);
         } else if i == 2 {
             i += 1;
-            cli_args.max_len = Some(arg.parse::<usize>().expect("Must be a number!"));
+            cli_args.max_len = Some(arg.parse::<u32>().expect("Must be a number!"));
         } else if i == 3 {
             i += 1;
-            cli_args.min_len = Some(arg.parse::<usize>().expect("Must be a number!"));
+            cli_args.min_len = Some(arg.parse::<u32>().expect("Must be a number!"));
         }
     }
 
@@ -50,8 +52,8 @@ pub fn analyze_args(args: Vec<String>) -> Option<CliArgs> {
 pub struct CliArgs {
     pub input_to_crack: Option<String>,
     pub hashing_algo: Option<String>,
-    pub max_len: Option<usize>,
-    pub min_len: Option<usize>,
+    pub max_len: Option<u32>,
+    pub min_len: Option<u32>,
     /// String with all the chars that should be used
     pub custom_alphabet: Option<String>,
     pub flag_show_help: bool,
@@ -62,6 +64,7 @@ pub struct CliArgs {
     pub flag_digits: bool,
     pub flag_common_special_chars: bool,
     pub flag_all_special_chars: bool,
+    pub flag_fair_mode: bool,
 }
 
 impl CliArgs {
@@ -80,6 +83,7 @@ impl CliArgs {
             flag_digits: false,
             flag_common_special_chars: false,
             flag_all_special_chars: false,
+            flag_fair_mode: false,
         }
     }
 }

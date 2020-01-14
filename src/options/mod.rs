@@ -1,21 +1,22 @@
 use libbruteforce::symbols;
 use libbruteforce::symbols::full_alphabet;
-use libbruteforce::transformation_fns::TransformationFn;
-use libbruteforce::transformation_fns::MD5_HASHING;
-use libbruteforce::transformation_fns::NO_HASHING;
-use libbruteforce::transformation_fns::SHA1_HASHING;
-use libbruteforce::transformation_fns::SHA256_HASHING;
+use libbruteforce::transform_fns::TransformFn;
+use libbruteforce::transform_fns::MD5_HASHING;
+use libbruteforce::transform_fns::NO_HASHING;
+use libbruteforce::transform_fns::SHA1_HASHING;
+use libbruteforce::transform_fns::SHA256_HASHING;
 
 use crate::args::CliArgs;
 use core::fmt;
 
 pub struct ProgramOptions {
     pub value_to_crack: String,
-    pub min_len: usize,
-    pub max_len: usize,
+    pub min_len: u32,
+    pub max_len: u32,
     pub alphabet: Box<[char]>,
     pub algo_name: String,
-    pub algo: TransformationFn,
+    pub algo: TransformFn,
+    pub fair_mode: bool,
 }
 
 impl ProgramOptions {
@@ -32,10 +33,11 @@ impl ProgramOptions {
                 .or(Option::from("identity".to_string()))
                 .unwrap(),
             algo: ProgramOptions::algo_str_to_fn(&args),
+            fair_mode: args.flag_fair_mode,
         }
     }
 
-    fn algo_str_to_fn(args: &CliArgs) -> TransformationFn {
+    fn algo_str_to_fn(args: &CliArgs) -> TransformFn {
         let mut algo = NO_HASHING;
         if args.hashing_algo.is_some() {
             let algo_str = (args.hashing_algo).as_ref();

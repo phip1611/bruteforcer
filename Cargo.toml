@@ -1,11 +1,11 @@
 [package]
 name = "bruteforcer"
-version = "1.0.0-SNAPSHOT"
+version = "1.0.0"
 authors = ["Philipp Schuster <philipp.schuster@t-systems.com>"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-libbruteforce = "1.0.1"
+libbruteforce = "2.0.0"
 # libbruteforce =  { path = "../libbruteforce" }
