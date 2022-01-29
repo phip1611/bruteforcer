@@ -2,8 +2,14 @@
 
 This cli uses [libbruteforce](https://github.com/phip1611/libbruteforce).
 
-For help type `bruteforce -h`
+## Installation
+`$ cargo install bruteforcer`
 
+## Usage Examples
+`$ bruteforcer -A=abcdef0123456789 2baf1f40105d9501fe319a8ec463fdf4325a2a5df445adf3f572f626253678c9 sha256`
+
+## Help
+For help type `bruteforce -h`
 ```
 Synopsis:
     $ bruteforcer <input_to_crack:string> <hashing_algo:string> <max_len:num> <min_len:num> [... flags]
