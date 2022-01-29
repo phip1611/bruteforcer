@@ -1,14 +1,34 @@
-use std::env;
-use std::time::Instant;
+//! bruteforcer - A cli program written in Rust to brute force hashes using libbruteforce
 
-use libbruteforce::symbols::{
-    combinations_count, ALL_OTHER_SPECIAL_CHARS, COMMON_SPECIAL_CHARS, LC_UMLAUTS, UC_UMLAUTS,
-};
-use libbruteforce::{crack, CrackParameter};
+/*#![deny(
+    clippy::all,
+    clippy::cargo,
+    clippy::nursery,
+    // clippy::restriction,
+    // clippy::pedantic
+)]
+// now allow a few rules which are denied by the above statement
+// --> they are ridiculous and not necessary
+#![allow(
+    clippy::suboptimal_flops,
+    clippy::redundant_pub_crate,
+    clippy::fallible_impl_from
+)]*/
+#![deny(missing_debug_implementations)]
+#![deny(rustdoc::all)]
+#![allow(rustdoc::missing_doc_code_examples)]
 
 use crate::args::analyze_args;
 use crate::options::ProgramOptions;
 use crate::strings::{HELP_TEXT, HELP_TEXT_SHORT};
+use libbruteforce::hash_fncs::{md5_hashing, no_hashing, sha1_hashing, sha256_hashing};
+use libbruteforce::symbols::{
+    ALL_OTHER_SPECIAL_CHARS, COMMON_SPECIAL_CHARS, LC_UMLAUTS, UC_UMLAUTS,
+};
+use libbruteforce::{crack, BasicCrackParameter, CrackParameter, TargetHashInput};
+use log::LevelFilter;
+use simple_logger::SimpleLogger;
+use std::env;
 
 mod args;
 mod options;
@@ -19,11 +39,18 @@ fn main() {
     env::args().for_each(|s| args.push(s));
     args.remove(0); // remove the program name
     let args = analyze_args(args);
-
     if args.is_none() {
         show_help(true);
         return;
     }
+
+    // to print progress reports from libbruteforce to the terminal
+    SimpleLogger::new()
+        .without_timestamps()
+        .with_level(LevelFilter::Trace)
+        .init()
+        .unwrap();
+
     let args = args.unwrap();
     if args.flag_show_help {
         show_help(false);
@@ -31,21 +58,34 @@ fn main() {
     }
     let ops = ProgramOptions::from(&args);
 
-    let cp = CrackParameter::new(
-        ops.value_to_crack,
-        ops.alphabet,
-        ops.max_len,
-        ops.min_len,
-        ops.algo,
-        ops.fair_mode,
-    );
+    let b_cp = BasicCrackParameter::new(ops.alphabet, ops.max_len, ops.min_len, ops.fair_mode);
 
-    let result = crack(cp);
+    // only possible working way to abstract the hashing algorithm;
+    // I didn't found a nice solution for this in libbruteforce.
+    let result = match ops.algo_name.to_lowercase().as_str() {
+        "md5" => crack(CrackParameter::new(
+            b_cp,
+            md5_hashing(TargetHashInput::HashAsStr(&ops.value_to_crack)),
+        )),
+        "sha1" => crack(CrackParameter::new(
+            b_cp,
+            sha1_hashing(TargetHashInput::HashAsStr(&ops.value_to_crack)),
+        )),
+        "sha256" => crack(CrackParameter::new(
+            b_cp,
+            sha256_hashing(TargetHashInput::HashAsStr(&ops.value_to_crack)),
+        )),
+        "identity" => crack(CrackParameter::new(
+            b_cp,
+            no_hashing(TargetHashInput::HashAsStr(&ops.value_to_crack)),
+        )),
+        _ => panic!("unknown variant"),
+    };
 
-    println!("done after {}s", result.seconds_as_fraction);
+    println!("Done after {:.3}s", result.duration_in_seconds());
 
-    if result.is_success() {
-        println!("The password is: {}", result.solution.unwrap());
+    if let Some(solution) = result.solution() {
+        println!("The password is: {}", solution);
     } else {
         println!("No solution found");
     }

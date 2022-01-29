@@ -1,9 +1,9 @@
-pub static HELP_TEXT_SHORT: &'static str = "\
+pub static HELP_TEXT_SHORT: &str = "\
 $ bruteforcer <input_to_crack> <hashing_algo> <max_len> <min_len>
 $ bruteforcer -h (for help)\
 ";
 
-pub static HELP_TEXT: &'static str = "\
+pub static HELP_TEXT: &str = "\
 Synopsis:
     $ bruteforcer <input_to_crack:string> <hashing_algo:string> <max_len:num> <min_len:num> [... flags]
 
@@ -20,7 +20,7 @@ flags:
     -u: use lower case umlauts (ä-ü)
     -S: use all special chars on QWERTZ keyboards
     -s: use common special chars on QWERTZ keyboards
-    -h: show help 
+    -h: show help
     -f: fair mode (use n-1 threads)
     -A=<Characters>
         - if this is set the above flags will be ignored
