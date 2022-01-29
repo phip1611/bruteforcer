@@ -24,7 +24,7 @@ dependencies = [
 
 [[package]]
 name = "bruteforcer"
-version = "1.0.0"
+version = "0.1.0"
 dependencies = [
  "libbruteforce",
  "log",
@@ -116,7 +116,9 @@ checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 
 [[package]]
 name = "libbruteforce"
-version = "4.0.0"
+version = "4.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d34c5a36156763f50061b6913d5844fffafdb96ff77036e95cf3c3db0d239fae"
 dependencies = [
  "hex",
  "log",
