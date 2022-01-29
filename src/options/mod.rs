@@ -1,5 +1,5 @@
-use libbruteforce::symbols;
 use crate::args::CliArgs;
+use libbruteforce::symbols;
 
 #[derive(Debug)]
 pub struct ProgramOptions {

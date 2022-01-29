@@ -1,11 +1,13 @@
 # bruteforcer - A cli program written in Rust to brute force hashes using libbruteforce
 
-This cli uses [libbruteforce](https://github.com/phip1611/libbruteforce).
+This CLI uses [libbruteforce](https://github.com/phip1611/libbruteforce). It can brute force passwords with various
+hash functions. For maximum performance the program takes advantage of all threads.
 
 ## Installation
 `$ cargo install bruteforcer`
 
 ## Usage Examples
+Bruteforce the given hash with the sha256 hashing algorithm and the given alphabet. \
 `$ bruteforcer -A=abcdef0123456789 2baf1f40105d9501fe319a8ec463fdf4325a2a5df445adf3f572f626253678c9 sha256`
 
 ## Help

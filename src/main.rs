@@ -1,3 +1,23 @@
+//! bruteforcer - A cli program written in Rust to brute force hashes using libbruteforce
+
+/*#![deny(
+    clippy::all,
+    clippy::cargo,
+    clippy::nursery,
+    // clippy::restriction,
+    // clippy::pedantic
+)]
+// now allow a few rules which are denied by the above statement
+// --> they are ridiculous and not necessary
+#![allow(
+    clippy::suboptimal_flops,
+    clippy::redundant_pub_crate,
+    clippy::fallible_impl_from
+)]*/
+#![deny(missing_debug_implementations)]
+#![deny(rustdoc::all)]
+#![allow(rustdoc::missing_doc_code_examples)]
+
 use crate::args::analyze_args;
 use crate::options::ProgramOptions;
 use crate::strings::{HELP_TEXT, HELP_TEXT_SHORT};
@@ -6,9 +26,9 @@ use libbruteforce::symbols::{
     ALL_OTHER_SPECIAL_CHARS, COMMON_SPECIAL_CHARS, LC_UMLAUTS, UC_UMLAUTS,
 };
 use libbruteforce::{crack, BasicCrackParameter, CrackParameter, TargetHashInput};
-use std::env;
 use log::LevelFilter;
 use simple_logger::SimpleLogger;
+use std::env;
 
 mod args;
 mod options;
@@ -24,8 +44,12 @@ fn main() {
         return;
     }
 
-    // to print progress reports from libbruteforce
-    SimpleLogger::new().without_timestamps().with_level(LevelFilter::Trace).init().unwrap();
+    // to print progress reports from libbruteforce to the terminal
+    SimpleLogger::new()
+        .without_timestamps()
+        .with_level(LevelFilter::Trace)
+        .init()
+        .unwrap();
 
     let args = args.unwrap();
     if args.flag_show_help {
@@ -36,6 +60,8 @@ fn main() {
 
     let b_cp = BasicCrackParameter::new(ops.alphabet, ops.max_len, ops.min_len, ops.fair_mode);
 
+    // only possible working way to abstract the hashing algorithm;
+    // I didn't found a nice solution for this in libbruteforce.
     let result = match ops.algo_name.to_lowercase().as_str() {
         "md5" => crack(CrackParameter::new(
             b_cp,
@@ -56,7 +82,7 @@ fn main() {
         _ => panic!("unknown variant"),
     };
 
-    println!("done after {}s", result.duration_in_seconds());
+    println!("Done after {:.3}s", result.duration_in_seconds());
 
     if let Some(solution) = result.solution() {
         println!("The password is: {}", solution);
