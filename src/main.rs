@@ -25,7 +25,7 @@ use libbruteforce::hash_fncs::{md5_hashing, no_hashing, sha1_hashing, sha256_has
 use libbruteforce::symbols::{
     ALL_OTHER_SPECIAL_CHARS, COMMON_SPECIAL_CHARS, LC_UMLAUTS, UC_UMLAUTS,
 };
-use libbruteforce::{crack, BasicCrackParameter, CrackParameter, TargetHashInput};
+use libbruteforce::{BasicCrackParameter, CrackParameter, TargetHashInput, crack};
 use log::LevelFilter;
 use simple_logger::SimpleLogger;
 use std::env;
